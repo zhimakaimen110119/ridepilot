@@ -9997,8 +9997,14 @@ function computeUiState(){
           ? `You've waited ${waitedMin} min.\nNot time to leave yet, but don't camp out either.`
           : `你已经等了 ${waitedMin} 分钟。\n这里还没到该走的时候，但也别一直耗着。`,
         buttonLabel: en ? "Got a ride" : "接到单了",
-        secondaryActionId: "extendWait",
-        secondaryLabel: en ? "Wait 5 more min" : "再等 5 分钟"
+        // V8.33.1: BUG FIX — secondary was "再等 5 分钟" which removed the
+        // driver's ability to switch spots during the reObserve window.
+        // Driver feedback: "等了 9 分钟想换点都没办法换." Fixed: secondary is
+        // navToRec (换个地方), consistent with continueWait branch (4c).
+        // Drivers who DO want to extend can still use the mini-actions row
+        // below the card (+5 / +10 / 自定义) — that path isn't lost.
+        secondaryActionId: "navToRec",
+        secondaryLabel: en ? "Switch spot" : "换个地方"
       };
     }
     // 4c. continueWait — normal active wait. Main = 接到单了. Secondary = 换个地方
