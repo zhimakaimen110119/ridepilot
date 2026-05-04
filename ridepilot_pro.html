@@ -261,6 +261,69 @@ header{display:flex;justify-content:space-between;align-items:center;gap:12px;pa
 .secondaryBtn:active{transform:scale(0.98)}
 .secondaryBtn:hover{color:var(--text);border-color:var(--text)}
 
+/* V8.34: tertiary button — even subtler than secondary. No border, just text.
+   Used when there's a 3rd "less common" option (e.g. cancel + change destination). */
+.tertiaryBtn{
+  display:block;width:100%;
+  margin-top:8px;
+  padding:10px 16px;
+  font-size:14px;font-weight:600;letter-spacing:.1px;
+  background:transparent;
+  color:var(--muted);
+  opacity:.8;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;font-family:inherit;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform 80ms ease, opacity 100ms ease;
+}
+.tertiaryBtn:active{transform:scale(0.98)}
+.tertiaryBtn:hover{opacity:1}
+
+/* V8.34: tiny ghost link — "状态不对？". Lives below card body. Subtle so
+   drivers don't reach for it impulsively, but findable when actually stuck. */
+.resetFlowLink{
+  display:block;
+  margin:10px auto 0;
+  padding:6px 10px;
+  background:transparent;
+  color:var(--muted);
+  opacity:.55;
+  border:none;
+  font-size:12px;font-weight:500;letter-spacing:.1px;
+  font-family:inherit;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  text-decoration:underline dotted;
+  text-underline-offset:3px;
+  transition:opacity 100ms;
+}
+.resetFlowLink:hover{opacity:.9}
+.resetFlowLink:active{opacity:1}
+
+/* V8.34: global "got a ride on platform" pill — small, sits between card
+   and main button. Doesn't compete with the primary decision but always
+   reachable when Uber/Lyft pinged the driver outside RidePilot's flow. */
+.globalPillRow{
+  display:flex; justify-content:center;
+  margin:10px 0 4px;
+}
+.globalPill{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:7px 14px;
+  background:var(--card2);
+  color:var(--text);
+  border:1px solid var(--line);
+  border-radius:999px;
+  font-size:13px;font-weight:700;letter-spacing:.1px;
+  font-family:inherit;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform 80ms, border-color 100ms, background 100ms;
+}
+.globalPill:hover{border-color:var(--blue);background:rgba(96,165,250,.08)}
+.globalPill:active{transform:scale(0.97)}
+
 /* ============== V8.26 TODAY SUMMARY (single line) ============== */
 .todaySummary{
   margin-top:14px;
@@ -1317,13 +1380,29 @@ details.advanced{background:var(--card2);border:1px dashed var(--line)}
     </button>
   </div>
   <div class="aBody" id="aBody">--</div>
+  <!-- V8.34: subtle "state not right?" reset link. Only visible in non-preTrip
+       states. Tap → confirmation dialog → clears current flow but preserves
+       today's records (trip log, counters, target, prefs). -->
+  <button class="resetFlowLink" id="resetFlowLink" onclick="onResetFlowTap()" style="display:none">--</button>
 </section>
+
+<!-- V8.34: global "got a ride on the platform" pill. Visible in all non-onTrip
+     states. Lets driver record a ride accepted in Uber/Lyft without RidePilot
+     having to know which sub-state they were in. Visually subtle (not a main
+     button — wouldn't compete with the primary decision). -->
+<div class="globalPillRow" id="globalPillRow" style="display:none">
+  <button class="globalPill" id="globalRidePill" onclick="onGlobalRidePillTap()">📱 平台接到单了？</button>
+</div>
 
 <!-- ===================== V8.26: single main button ===================== -->
 <div class="mainBtnWrap" id="mainBtnWrap">
   <button class="mainBtn" id="mainBtn" onclick="onMainBtnTap()">--</button>
   <!-- V8.26.1: secondary button (faint), only shown in enRoute state for "先不去了" -->
   <button class="secondaryBtn" id="secondaryBtn" onclick="onSecondaryBtnTap()" style="display:none">--</button>
+  <!-- V8.34: tertiary button (faintest, ghost-link style). Used when the
+       state needs three options — e.g. enRoute now offers 到了 / 临时停一下 /
+       取消去别的地方. -->
+  <button class="tertiaryBtn" id="tertiaryBtn" onclick="onTertiaryBtnTap()" style="display:none">--</button>
 </div>
 
 <!-- ===================== V8.26: today summary line ===================== -->
@@ -2748,7 +2827,12 @@ const DEFAULT_STATE = {
     homeFilterActive: false,      // user has turned on Uber Home Filter
     homeFilterStartedAt: null,    // ms timestamp Filter was activated
     pausedAfterStop: false,       // V8.7: transient — set by stopTimerAndShowBackup. NOT persisted.
-    pausedAfterStopAt: null       // V8.9: ms timestamp paused state began. Auto-expires after 10 min.
+    pausedAfterStopAt: null,      // V8.9: ms timestamp paused state began. Auto-expires after 10 min.
+    // V8.34: temporary pause during enRoute (driver stopped to refuel, eat, etc.).
+    // enRouteDest is preserved — driver can resume going to it. Different from
+    // cancelEnRouteFromCard which clears the destination.
+    enRoutePaused: false,
+    enRoutePausedAt: null         // ms timestamp when pause began
   },
   themePref: "system",            // system | light | dark
   langPref: "system",             // system | zh | en (V7.6: i18n)
@@ -3033,6 +3117,11 @@ function enterMode(newMode, ctx){
   // sequencing is: enterMode("preTrip") → flag cleared → stopTimer sets flag = true.
   state.subContext.pausedAfterStop = false;
   state.subContext.pausedAfterStopAt = null;
+  // V8.34: leaving enRoute (e.g. arriving, accepting trip, cancelling) → clear pause flag
+  if (oldMode === "enRoute" && newMode !== "enRoute") {
+    state.subContext.enRoutePaused = false;
+    state.subContext.enRoutePausedAt = null;
+  }
   // Mode-specific banner
   const enM = currentLang() === "en";
   const transitionBanners = enM
@@ -5135,21 +5224,33 @@ function acceptTrip(){
 
   state.trip.status = "onTrip";
   state.trip.currentTripAcceptedAt = now;
+  state.trip._overduePrompted = false;  // V8.34: reset overdue advisor for new trip
   state.reminders.waitEnd = null;
   state.reminders.waitAlerted = false;
   // V8.33: trip accepted → cancel any pending wait-end notification
   if (typeof rpCancelNotification === 'function') rpCancelNotification('wait-end');
 
-  const start =
-    state.trip.lastTripEndedAt ||
-    state.trip.currentWaitStartedAt ||
-    state.arrivedAt ||
-    state.lastInteractionAt;
-  if (start) {
-    const gap = Math.max(0, Math.round((now - start) / 60000));
-    state.trip.lastGapMinutes = gap;
-    state.trip.todayTotalGapMinutes += gap;
+  // V8.33.3: BUG FIX — gap calculation now uses totalWaitMin() which sums
+  // cumulativeWaitMin (closed segments from pause/resume cycles + cancelled
+  // navigations) + the current active segment. Pre-V8.33.3, we only used
+  // `now - currentWaitStartedAt`, which captured ONLY the latest segment.
+  // Driver feedback: "累计等候时间不准确."
+  // Example bug: wait 9 min in Bellevue → pause → come back 30 min later →
+  // wait 5 min → accept trip. Real wait = 14 min, was logged as 5.
+  // Fallback: if no wait state at all (rare — e.g. driver tapped 接到单了
+  // straight from preTrip), use the legacy time-since-anchor calculation.
+  let gap;
+  if (state.trip && (state.trip.cumulativeWaitMin > 0 || state.trip.currentWaitStartedAt)) {
+    gap = Math.max(0, totalWaitMin());
+  } else {
+    const start =
+      state.trip.lastTripEndedAt ||
+      state.arrivedAt ||
+      state.lastInteractionAt;
+    gap = start ? Math.max(0, Math.round((now - start) / 60000)) : 0;
   }
+  state.trip.lastGapMinutes = gap;
+  state.trip.todayTotalGapMinutes += gap;
   state.panic = "normal";
   state.waitStage = 0;
   state.income = "unknown";
@@ -5215,6 +5316,13 @@ function endTrip(){
     enE ? "Trip ended" : "单已结束",
     enE ? `${dur} min trip · ${td} trip${td !== 1 ? "s" : ""} today` : `本单 ${dur} 分钟 · 今日 ${td} 单`,
     "good", 5000);
+  // V8.34: drop-off advisor — surface a contextual banner when the drop-off
+  // location is notably weak (remote zone) or strong (good for current segment).
+  // Driver feedback that motivated this: "每单结束后不知道下一步" — endTrip
+  // returning to a generic preTrip card misses the most actionable moment of
+  // the day (just dropped off, must decide what's next). 800ms delay so it
+  // shows AFTER the "Trip ended" banner.
+  setTimeout(() => { try { showDropOffAdvisor(); } catch(e){} }, 800);
   if (justReachedTarget) {
     const en = currentLang() === "en";
     setTimeout(() => {
@@ -7623,6 +7731,10 @@ function segmentReminders(){
   ];
 }
 function checkTimers(){
+  // V8.34: onTrip overdue advisor — fire if onTrip has been running unusually
+  // long without an endTrip tap. Self-deduplicates via state.trip._overduePrompted.
+  try { maybeShowOnTripOverduePrompt(); } catch(e){}
+
   if (state.reminders.waitEnd) {
     const left = state.reminders.waitEnd - Date.now();
     // V8.14: stale countdown — if waitEnd is more than 30 min in the past, the
@@ -9749,6 +9861,9 @@ function renderAnswerCard(){
 
   // V8.26.1: render secondary button (enRoute "先不去了" only)
   renderSecondaryBtn(decision);
+  renderTertiaryBtn(decision);
+  renderResetFlowLink();
+  renderGlobalRidePill();
 
   // V8.26: today summary line — single line, plain language
   renderTodaySummary();
@@ -9803,6 +9918,36 @@ function computeUiState(){
     const destId = state.subContext && state.subContext.enRouteDest;
     const dest = destId ? zones.find(z => z.id === destId) : null;
     const destShort = dest ? dest.short : (en ? "the spot" : "推荐点");
+
+    // V8.34: NEW STATE — temporary pause during enRoute (refuel, eat, restroom).
+    // enRouteDest is preserved; driver explicitly tapped 「临时停一下」 earlier.
+    // Card offers 3 options: continue to dest, switch dest, wait here.
+    if (state.subContext && state.subContext.enRoutePaused) {
+      const here = (typeof nearestZone === "function") ? nearestZone(state.current) : null;
+      const hereShort = here ? here.short : (en ? "current location" : "当前位置");
+      const pausedAt = state.subContext.enRoutePausedAt;
+      const pausedMin = pausedAt ? Math.max(0, Math.floor((Date.now() - pausedAt) / 60000)) : 0;
+      const pausedNote = pausedMin >= 1
+        ? (en ? ` · paused ${pausedMin} min` : ` · 已停 ${pausedMin} 分钟`)
+        : "";
+      return {
+        actionId: "resumeEnRoute",
+        tone: "good",
+        title: en ? `Paused at ${hereShort}` : `在 ${hereShort} 临时停留`,
+        body:  en
+          ? `Original plan: head to ${destShort}${pausedNote}.\nResume when ready, or change plan.`
+          : `本来要去 ${destShort}${pausedNote}。\n想好了再继续 · 也可以换地方或就在这等单。`,
+        buttonLabel: en ? `Continue to ${destShort}` : `继续去 ${destShort}`,
+        secondaryActionId: "waitHere",
+        secondaryLabel: en ? `Wait here at ${hereShort}` : `就在这等单`,
+        tertiaryActionId: "navToRec",
+        tertiaryLabel: en ? "Change destination" : "换个目的地"
+      };
+    }
+
+    // V8.34: regular enRoute now has 3 buttons (was 2).
+    // Primary: 到了, Secondary: 临时停一下 (NEW, addresses real-life refuel/eat),
+    // Tertiary: 取消去别处 (was secondary "先不去了").
     return {
       actionId: "arrived",
       tone: "good",
@@ -9811,9 +9956,11 @@ function computeUiState(){
         ? `Once at ${destShort}, find a safe place to pull over.\nStart the wait timer when you're settled — no rush.`
         : `到 ${destShort} 后，先找个安全位置停下。\n到了再开始计时，不急。`,
       buttonLabel: en ? "I'm here, start waiting" : "到了，开始等",
-      // V8.26.1: secondary action — cancel and re-judge from current position
-      secondaryActionId: "cancelEnRoute",
-      secondaryLabel: en ? "Never mind" : "先不去了"
+      // V8.34: was the only secondary, now 3 options:
+      secondaryActionId: "pauseEnRoute",
+      secondaryLabel: en ? "Stopping briefly" : "临时停一下",
+      tertiaryActionId: "cancelEnRoute",
+      tertiaryLabel: en ? "Cancel — go elsewhere" : "取消，去别的地方"
     };
   }
 
@@ -10147,6 +10294,10 @@ function onMainBtnTap(){
     }
     case "extendWait":  return startWaitCountdown(5);
     case "gotRide":     return acceptTrip();
+    // V8.34: enRoute pause/resume/wait-here lifecycle
+    case "resumeEnRoute":  return resumeEnRoute();
+    case "pauseEnRoute":   return pauseEnRoute();
+    case "waitHere":       return waitHereInsteadOfEnRoute();
     case "startWait":   {
       // Use the waitMin from the analyzer (default 10)
       const a = analyzeCurrentPosition();
@@ -10272,7 +10423,380 @@ function onSecondaryBtnTap(){
     }
     // V8.27.2: from paused state — driver wants to stop waiting entirely
     case "stopWaiting":    return stopWaitingFromPaused();
+    // V8.34: enRoute pause/resume/switch-here flow
+    case "pauseEnRoute":     return pauseEnRoute();
+    case "resumeEnRoute":    return resumeEnRoute();
+    case "waitHere":         return waitHereInsteadOfEnRoute();
   }
+}
+
+/* =========================================================
+   V8.34: Tertiary button — even fainter than secondary.
+   Used when a card needs three options (e.g. enRoute now offers
+   到了 / 临时停一下 / 取消去别的地方).
+   ========================================================= */
+function renderTertiaryBtn(decision){
+  const el = document.getElementById("tertiaryBtn");
+  if (!el) return;
+  if (!decision.tertiaryLabel || !decision.tertiaryActionId) {
+    el.style.display = "none";
+    return;
+  }
+  el.style.display = "";
+  el.textContent = decision.tertiaryLabel;
+  if (el.dataset) {
+    el.dataset.actionId = decision.tertiaryActionId;
+  } else {
+    el._actionId = decision.tertiaryActionId;
+  }
+}
+
+function onTertiaryBtnTap(){
+  touch();
+  const btn = document.getElementById("tertiaryBtn");
+  if (!btn) return;
+  const id = (btn.dataset && btn.dataset.actionId) || btn._actionId;
+  switch (id) {
+    case "cancelEnRoute":  return cancelEnRouteFromCard();
+    case "navToRec":       {
+      const cur = nearestZone(state.current);
+      const rec = (typeof ranked !== "undefined" && Array.isArray(ranked))
+        ? (ranked.find(z => z.id !== cur.id) || ranked[0])
+        : zones.find(z => z.id === "bellevue");
+      if (rec) return openNavigatePanel(rec.id);
+      return;
+    }
+    case "gotRide":        return acceptTrip();
+    case "stopWaiting":    return stopWaitingFromPaused();
+    case "pauseEnRoute":   return pauseEnRoute();
+    case "resumeEnRoute":  return resumeEnRoute();
+    case "waitHere":       return waitHereInsteadOfEnRoute();
+  }
+}
+
+/* =========================================================
+   V8.34: "状态不对？" reset escape hatch.
+   Subtle ghost link below card body — visible in non-preTrip states.
+   Tap → confirmation banner → clears current flow but PRESERVES
+   today's records (trip log, todayTrips, todayTotalGapMinutes,
+   target, prefs). Re-judges location from GPS.
+
+   Why this exists: real life desyncs RidePilot from reality:
+   - Driver accepted a ride in Uber Driver, app didn't know
+   - Trip ended but driver forgot to tap endTrip
+   - Page reloaded with stale state
+   - GPS drifted, mode is wrong
+   Without an escape hatch, drivers either uninstall or live with
+   confusing state. The escape is intentionally subtle (small dotted
+   underline, opacity .55) to discourage impulsive resets.
+   ========================================================= */
+function onResetFlowTap(){
+  touch();
+  const en = currentLang() === "en";
+  showBanner(
+    en ? "Reset current flow?" : "重置当前流程？",
+    en ? "Today's records (trips, cancels, waits, target, prefs) will be kept."
+       : "今日单数、取消、等待记录不会丢。偏好和目标也保留。",
+    "warn", 30000,
+    [
+      { label: en ? "Reset" : "确认重置",
+        cls: "warn",
+        onClick: () => doResetFlow() },
+      { label: en ? "Cancel" : "取消",
+        cls: "ghost",
+        onClick: () => {} }
+    ]);
+}
+
+function doResetFlow(){
+  // V8.34: clear all transient flow state. PRESERVE: trip log, today
+  // counters, target, homeFilter session counts, prefs, theme, lang.
+  if (state.subContext) {
+    state.subContext.enRouteDest = null;
+    state.subContext.enRouteStartedAt = null;
+    state.subContext.enRouteEta = null;
+    state.subContext.enRouteOriginZoneId = null;
+    state.subContext.enRoutePaused = false;
+    state.subContext.enRoutePausedAt = null;
+    state.subContext.arrivedZoneId = null;
+    state.subContext.rescueChain = false;
+    state.subContext.pausedAfterStop = false;
+    state.subContext.pausedAfterStopAt = null;
+    // Keep homeFilterActive — that reflects whether the driver has the
+    // Filter on in Uber, which RidePilot can't actually toggle.
+  }
+  if (state.reminders) {
+    state.reminders.waitEnd = null;
+    state.reminders.waitAlerted = false;
+    state.reminders.pausedRemainingMs = null;
+  }
+  if (state.trip) {
+    // Clear current-trip-in-progress fields, but NOT the daily counters or log
+    state.trip.status = "idle";
+    state.trip.currentTripAcceptedAt = null;
+    state.trip.currentWaitStartedAt = null;
+    state.trip.cumulativeWaitMin = 0;
+    state.trip.segmentBridgePromptedFor = null;
+    state.trip.longWaitWarnedThreshold = 0;
+  }
+  state.arrivedZoneId = null;
+  state.currentZoneOverride = null;
+  // V8.34: re-judge location from GPS — clears any stale "I was at X" assumption.
+  state.locationSource = state.locationAccuracy != null && state.locationAccuracy <= 80 ? "gps" : "home";
+
+  if (typeof rpCancelAllNotifications === 'function') rpCancelAllNotifications();
+
+  enterMode("preTrip");
+  save();
+  render();
+
+  const en = currentLang() === "en";
+  showBanner(
+    en ? "Flow reset" : "已重置当前流程",
+    en ? "Re-evaluating from your current location." : "正在从当前位置重新判断。",
+    "good", 2500);
+}
+
+/* V8.34: should the reset link be visible right now? Hidden in preTrip
+   (nothing to reset) and in onTrip when no other escape exists (let the
+   onTrip card show its own end/cancel buttons cleanly). */
+function shouldShowResetFlow(){
+  if (!state || !state.mode) return false;
+  if (state.mode === "preTrip") return false;
+  if (state.subContext && state.subContext.pausedAfterStop) {
+    // Paused has its own resume/stop buttons — reset would be redundant.
+    return false;
+  }
+  return true;
+}
+
+function renderResetFlowLink(){
+  const el = document.getElementById("resetFlowLink");
+  if (!el) return;
+  if (!shouldShowResetFlow()) {
+    el.style.display = "none";
+    return;
+  }
+  const en = currentLang() === "en";
+  el.textContent = en ? "Status off? Reset" : "状态不对？";
+  el.style.display = "";
+}
+
+/* =========================================================
+   V8.34: global "platform got me a ride" pill.
+   Reachable in all non-onTrip states. Drivers who tap accept in
+   Uber Driver / Lyft (without coming back to RidePilot first) need
+   a one-tap way to tell RidePilot "I'm on a ride now".
+   ========================================================= */
+function onGlobalRidePillTap(){
+  touch();
+  // Just a thin wrapper around acceptTrip — that function already handles
+  // gap calculation, mode transitions, banner, etc.
+  if (state.mode === "onTrip") {
+    // Already on trip — pill shouldn't be visible, but guard anyway
+    return;
+  }
+  acceptTrip();
+}
+
+function shouldShowGlobalRidePill(){
+  if (!state || !state.mode) return false;
+  // Hidden during onTrip — already on a ride
+  if (state.mode === "onTrip") return false;
+  // Hidden during paused-after-stop (driver explicitly stopped, would be confusing)
+  if (state.subContext && state.subContext.pausedAfterStop) return false;
+  return true;
+}
+
+function renderGlobalRidePill(){
+  const row = document.getElementById("globalPillRow");
+  const pill = document.getElementById("globalRidePill");
+  if (!row || !pill) return;
+  if (!shouldShowGlobalRidePill()) {
+    row.style.display = "none";
+    return;
+  }
+  const en = currentLang() === "en";
+  pill.textContent = en ? "📱 Got a ride on the app?" : "📱 平台接到单了？";
+  row.style.display = "flex";
+}
+
+/* =========================================================
+   V8.34: onTrip overdue advisor.
+   When onTrip duration exceeds expected*1.5 (clamped 35-75 min),
+   show a non-intrusive advisor: "this ride still going? [end] [yep]".
+   Adaptive — uses driver's historical avg trip length when available.
+   ========================================================= */
+function getExpectedTripMinutes(){
+  // Look at last 10 completed trips in tripLog with valid duration
+  if (!Array.isArray(state.tripLog)) return 25;
+  const recents = state.tripLog
+    .filter(e => e && (e.type === "trip" || e.type === "merged") &&
+                  typeof e.durationMin === "number" && e.durationMin > 0 &&
+                  e.durationMin < 180)  // sanity cap
+    .slice(-10);
+  if (recents.length < 3) return 25;  // not enough data — use platform avg
+  const total = recents.reduce((s, e) => {
+    // For merged entries, durationMin is the SPAN, not per-trip. Use approx.
+    if (e.type === "merged" && e.count > 0) return s + (e.durationMin / e.count);
+    return s + e.durationMin;
+  }, 0);
+  return total / recents.length;
+}
+
+function getOnTripPromptThresholdMin(){
+  const expected = getExpectedTripMinutes();
+  let threshold = expected * 1.5;
+  // Clamp 35-75 per Roy's spec
+  if (threshold < 35) threshold = 35;
+  if (threshold > 75) threshold = 75;
+  return Math.round(threshold);
+}
+
+function maybeShowOnTripOverduePrompt(){
+  // Called from the 1s ticker. Only fires once per onTrip session.
+  if (state.mode !== "onTrip") return;
+  if (!state.trip || !state.trip.currentTripAcceptedAt) return;
+  if (state.trip._overduePrompted) return;
+  const elapsedMin = Math.floor((Date.now() - state.trip.currentTripAcceptedAt) / 60000);
+  const threshold = getOnTripPromptThresholdMin();
+  if (elapsedMin < threshold) return;
+  state.trip._overduePrompted = true;
+  // Don't persist this flag — it's per-session. Each app reload would re-prompt
+  // if onTrip is still active. That's fine: stale onTrip is exactly what we
+  // want to flag.
+  const en = currentLang() === "en";
+  showBanner(
+    en ? "This ride still going?" : "这单还在跑吗？",
+    en ? `It's been ${elapsedMin} min — just checking it didn't end already.`
+       : `已经 ${elapsedMin} 分钟 — 看你是不是忘了点单结束。`,
+    "warn", 30000,
+    [
+      { label: en ? "Trip ended"  : "单结束",  cls: "primary", onClick: () => endTrip() },
+      { label: en ? "Still going" : "还在跑",  cls: "ghost",   onClick: () => {} }
+    ]);
+}
+
+/* =========================================================
+   V8.34: drop-off advisor.
+   After endTrip(), evaluate the current GPS location and surface
+   a one-shot advisor if the drop-off zone is unusually weak/strong.
+   "Just dropped off in [X] · [advice]"
+   This is a transient banner, NOT a new mode. State machine stays
+   the same — endTrip → preTrip — we just add a contextual banner.
+   ========================================================= */
+function showDropOffAdvisor(){
+  // Called from endTrip after the basic "Trip ended" banner.
+  if (state.mode !== "preTrip") return;
+  const here = nearestZone(state.current);
+  if (!here) return;
+  const seg = (typeof segmentNow === "function") ? segmentNow() : null;
+  const en = currentLang() === "en";
+
+  // Score the current zone for the current segment
+  let advice = null;
+  let tone = "good";
+
+  // Remote zones — driver was driven far. Recommend stepping-stone return.
+  const remoteIds = ["seatac","tacoma","federal_way","everett","lynnwood","seattle_downtown"];
+  if (remoteIds.includes(here.id)) {
+    advice = en
+      ? `Don't camp here — frog-hop to a closer hub before driving home empty.`
+      : `这里是远区，别裸等。先蛙跳到近一点的主区再决定。`;
+    tone = "warn";
+  } else if (seg) {
+    // Score quality of this drop-off zone for the current segment
+    let score = null;
+    try { score = (typeof scoreZone === "function") ? scoreZone(here) : null; } catch(e){ score = null; }
+    if (score != null) {
+      if (score >= 70) {
+        advice = en
+          ? `${here.short} is a solid spot for the current window — short wait works here.`
+          : `${here.short} 在当前时段还行，可以短等 5-8 分钟。`;
+        tone = "good";
+      } else if (score < 50) {
+        advice = en
+          ? `${here.short} is weak right now — short test then reposition if no ping.`
+          : `${here.short} 当前时段偏弱，短测一下，没单就换点。`;
+        tone = "warn";
+      }
+      // 50-70: neutral, no advisor — let the regular preTrip card handle it
+    }
+  }
+  if (!advice) return;
+  const title = en
+    ? `Dropped off in ${here.short}`
+    : `刚下客在 ${here.short}`;
+  showBanner(title, advice, tone, 8000);
+}
+
+/* =========================================================
+   V8.34: 临时停一下 — driver pauses the en-route trip.
+   Common scenario: heading to recommended spot, but stops to
+   refuel / eat / use restroom along the way. enRouteDest is
+   PRESERVED — driver can resume going there later, OR change
+   their mind and pick a different spot, OR start waiting at
+   the current location.
+   Pre-V8.34: only options were "到了" (arrived) and "先不去了"
+   (cancel). Neither matched "I'm just stopping briefly."
+   ========================================================= */
+function pauseEnRoute(){
+  touch();
+  if (!state.subContext || !state.subContext.enRouteDest) {
+    // Not in enRoute — guard against stale tap
+    return;
+  }
+  state.subContext.enRoutePaused = true;
+  state.subContext.enRoutePausedAt = Date.now();
+  // Stay in enRoute mode — the destination is still "the plan."
+  // The card will detect enRoutePaused and render a different view.
+  save();
+  render();
+  const en = currentLang() === "en";
+  showBanner(
+    en ? "Paused — take your time" : "已停下 · 不催你",
+    en ? "Resume, change plan, or wait here when you're ready."
+       : "想好了再继续 · 也可以换地方或就在这等单。",
+    "good", 2500);
+}
+
+/* V8.34: resume going to the original enRoute destination. */
+function resumeEnRoute(){
+  touch();
+  if (!state.subContext) return;
+  state.subContext.enRoutePaused = false;
+  state.subContext.enRoutePausedAt = null;
+  // enRouteDest is unchanged — we just clear the pause flag and re-render.
+  // The card returns to "去推荐点路上" with 到了/临时停/取消 buttons.
+  save();
+  render();
+}
+
+/* V8.34: driver decides to wait at the current spot instead of continuing
+   to the en-route destination. This converts the paused-en-route into
+   a fresh waiting state at the driver's CURRENT GPS location (not the
+   original origin, not the destination). */
+function waitHereInsteadOfEnRoute(){
+  touch();
+  // Clear enRoute state cleanly
+  if (state.subContext) {
+    state.subContext.enRouteDest = null;
+    state.subContext.enRouteStartedAt = null;
+    state.subContext.enRouteEta = null;
+    state.subContext.enRouteOriginZoneId = null;
+    state.subContext.enRoutePaused = false;
+    state.subContext.enRoutePausedAt = null;
+  }
+  // Use current GPS to determine the new wait location.
+  const here = (typeof nearestZone === "function") ? nearestZone(state.current) : null;
+  if (here) state.arrivedZoneId = here.id;
+  // Reset wait accumulation — this is a brand new spot
+  if (state.trip) {
+    state.trip.cumulativeWaitMin = 0;
+    state.trip.segmentBridgePromptedFor = null;
+  }
+  // Start a fresh wait timer
+  startWaitCountdown(10);
 }
 
 /* V8.27.2: User taps "结束等单" from the paused state — drops the saved
@@ -10363,11 +10887,30 @@ function cancelEnRouteFromCard(){
           onClick: () => openNavigatePanel() }
       ]);
   } else {
-    // Driver actually moved (or no origin info) — reset cumulative cleanly.
-    if (state.trip) { state.trip.cumulativeWaitMin = 0; state.trip.segmentBridgePromptedFor = null; }
-    showBanner(
-      en ? "Cancelled — re-evaluating from here" : "已取消前往，重新判断当前位置",
-      "", "good", 2200);
+    // V8.33.2: BUG FIX — driver has moved (or origin unknown).
+    // Pre-V8.33.2 we reset cumulativeWaitMin to 0 here, treating the cancelled
+    // navigation as "starting fresh." But the wait time before tapping 换个地方
+    // is real evidence of the day — even if the driver drove a few minutes
+    // before changing their mind, those 9 min waited at Bellevue still happened
+    // and still inform decisions like "long-wait warnings" / "time to leave."
+    // Now we PRESERVE cumulative and tell the driver explicitly so they don't
+    // feel their wait time was forgotten.
+    // We do still clear segmentBridgePromptedFor — that marker was tied to the
+    // cancelled bridge intent, not to wait history.
+    if (state.trip) state.trip.segmentBridgePromptedFor = null;
+    if (cumulative > 0) {
+      const originZone = originId ? zones.find(z => z.id === originId) : null;
+      const originName = originZone ? originZone.short : (en ? "previous spot" : "原地");
+      showBanner(
+        en ? `Cancelled · ${cumulative} min from ${originName} kept` : `已取消 · 之前在 ${originName} 等的 ${cumulative} 分钟保留`,
+        en ? "Re-evaluating from your current location."
+           : "在新位置重新判断，之前的等待时间不会忘。",
+        "good", 3000);
+    } else {
+      showBanner(
+        en ? "Cancelled — re-evaluating from here" : "已取消前往，重新判断当前位置",
+        "", "good", 2200);
+    }
   }
   save(); render();
 }
