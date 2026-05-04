@@ -1,6 +1,6 @@
 // RidePilot Service Worker
 // Version bump on each release to force cache refresh.
-const VERSION = 'ridepilot-v8.33.1';
+const VERSION = 'ridepilot-v8.34.0';
 const CORE_ASSETS = [
   './',
   './ridepilot_pro.html',
