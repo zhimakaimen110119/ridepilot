@@ -2672,27 +2672,27 @@ function getSegmentSteps(seg, dow, holiday){
   }
   if (id === "evening") {
     if (isFri) return [
-      "周五黄金窗口（最强 1.45×）：Happy hour + 周末出门双重叠加。",
+      "周五晚高峰（最强）：Happy hour + 周末出门双重叠加。",
       "Bellevue 98004 餐厅区起步（Lincoln Square / Old Bellevue），关 Filter。",
       "Kirkland Waterfront / Park Ln 5–7 PM 是高峰。",
       "顺单进城去 SLU/Capitol，回程别空车跨湖。",
       "目标：5–7 PM 至少 4 单，否则站位有问题。"
     ];
     if (isSat) return [
-      "周六黄金窗口（次强 1.45×）：晚餐 + 夜场预热。",
+      "周六晚高峰（次强）：晚餐 + 夜场预热。",
       "Bellevue Square / Kirkland Waterfront 餐厅区为主。",
       "Lake Washington 周边周末晚餐单密度高。",
       "20:30 后 Capitol/Belltown 开始热，可以顺单进城。",
       "不要空车跨湖去 Seattle，必须有顺路单带过去。"
     ];
     if (isSun) return [
-      "周日黄金窗口（中等 1.45×）：晚餐主导，夜场偏冷。",
+      "周日晚高峰（中等）：晚餐主导，夜场偏冷。",
       "Bellevue/Kirkland 餐厅区为主，城里别死等。",
       "5:30–7:30 PM 是核心爆发，吃晚餐单。",
       "22:00 后准备早收，周日夜场不值得熬。"
     ];
     return [
-      `${dowName[dow]} 黄金窗口（1.45×）：东区起步。`,
+      `${dowName[dow]} 晚高峰：东区起步。`,
       "Bellevue 98004 / Kirkland 主战场，关 Filter 全力跑。",
       "餐厅区 + 写字楼下班双叠加。",
       "顺单进城别空跑，跨湖必须有单带过去。"
@@ -2787,20 +2787,20 @@ const segments = [
   // falls back to checking same-side. New cities populate these per-segment
   // without changing algorithm code.
   { id:"dead",    start:150, end:330,  short:"低效",   shortEn:"Off",       title:"收工/休息",      titleEn:"Wind down / rest",         target:"Home",              targetEn:"Home",                tone:"bad",  mult:0.90, analysis:"2:30–5:30 AM 不适合盲接硬熬。",                          analysisEn:"2:30–5:30 AM not worth grinding.",                                                                  steps:["开 Home Filter 回 Totem。","不要追远 pickup。","休息比硬跑更值。"],                                                                          stepsEn:["Turn on Home Filter, head to Totem.","Skip far pickups.","Rest beats grinding."] },
-  { id:"prep",    start:330, end:390,  short:"预热",   shortEn:"Warmup",    title:"准备早峰",        titleEn:"Pre-rush warmup",          target:"Bellevue",          targetEn:"Bellevue",            tone:"warn", mult:1.00, analysis:"5:30–6:30 AM 上线观察，不急冲。",                          analysisEn:"5:30–6:30 AM go online but don't rush.",                                                            steps:["在家附近最多等 10 分钟。","没单别急冲 Seattle。","6:30 后再认真跑。"],                                                                       stepsEn:["Wait near home up to 10 min.","Don't blast into Seattle without a ping.","Get serious after 6:30."],
+  { id:"prep",    start:330, end:390,  short:"预热",   shortEn:"Warmup",    title:"早高峰前",        titleEn:"Pre-rush warmup",          target:"Bellevue",          targetEn:"Bellevue",            tone:"warn", mult:1.00, analysis:"5:30–6:30 AM 上线观察，不急冲。",                          analysisEn:"5:30–6:30 AM go online but don't rush.",                                                            steps:["在家附近最多等 10 分钟。","没单别急冲 Seattle。","6:30 后再认真跑。"],                                                                       stepsEn:["Wait near home up to 10 min.","Don't blast into Seattle without a ping.","Get serious after 6:30."],
     targetZoneIds:["bellevue","kirkland","kirklandurban","redmond","totem","factoria","bothell"], targetSides:["east"] },
-  { id:"morning", start:390, end:555,  short:"早峰",   shortEn:"AM rush",   title:"通勤窗口",        titleEn:"Commute window",           target:"Bellevue/Redmond",  targetEn:"Bellevue/Redmond",    tone:"good", mult:1.35, analysis:"6:30–9:15 AM 吃通勤。东区优先，顺单进 SLU，不空车跨湖。",   analysisEn:"6:30–9:15 AM commute hours. Eastside first, ride into SLU only with a fare.",                       steps:["Totem/Kirkland 起步。","Bellevue/Redmond 更稳。","跨湖要有单带过去。"],                                                                      stepsEn:["Start at Totem/Kirkland.","Bellevue/Redmond are steadier.","Only cross the lake with a fare."],
+  { id:"morning", start:390, end:555,  short:"早高峰",   shortEn:"AM rush",   title:"早高峰",          titleEn:"Commute window",           target:"Bellevue/Redmond",  targetEn:"Bellevue/Redmond",    tone:"good", mult:1.35, analysis:"6:30–9:15 AM 吃通勤。东区优先，顺单进 SLU，不空车跨湖。",   analysisEn:"6:30–9:15 AM commute hours. Eastside first, ride into SLU only with a fare.",                       steps:["Totem/Kirkland 起步。","Bellevue/Redmond 更稳。","跨湖要有单带过去。"],                                                                      stepsEn:["Start at Totem/Kirkland.","Bellevue/Redmond are steadier.","Only cross the lake with a fare."],
     targetZoneIds:["bellevue","kirkland","kirklandurban","redmond","totem","factoria"], targetSides:["east"] },
-  { id:"mid",     start:555, end:660,  short:"收尾",   shortEn:"Tapering",  title:"早峰收尾",        titleEn:"AM rush tapering",         target:"Bellevue",          targetEn:"Bellevue",            tone:"warn", mult:1.05, analysis:"9:15–11:00 AM 需求变软。",                                  analysisEn:"9:15–11:00 AM demand softens.",                                                                     steps:["只守高密度区。","10–15 分钟没单就停或换点。","别蹲机场。"],                                                                                   stepsEn:["Only camp dense zones.","After 10–15 min idle, stop or move.","Don't stake out the airport."] },
-  { id:"lunch",   start:660, end:840,  short:"午间",   shortEn:"Lunch",     title:"轻跑",            titleEn:"Light driving",            target:"Bellevue/Kirkland", targetEn:"Bellevue/Kirkland",   tone:"warn", mult:1.00, analysis:"11:00 AM–2:00 PM 爆发弱。",                                analysisEn:"11:00 AM–2:00 PM weak surge potential.",                                                            steps:["Bellevue/Kirkland 短等。","不追 15+ 分钟 pickup。","低效就休息。"],                                                                            stepsEn:["Short waits in Bellevue/Kirkland.","Skip 15+ min pickups.","If slow, rest."] },
-  { id:"slow",    start:840, end:990,  short:"低谷",   shortEn:"Lull",      title:"低谷防空跑",      titleEn:"Lull · avoid dry runs",    target:"Bellevue",          targetEn:"Bellevue",            tone:"warn", mult:1.05, analysis:"2:00–4:30 PM 容易低效。",                                  analysisEn:"2:00–4:30 PM tends to drag.",                                                                       steps:["必须跑就去 Bellevue。","不要在住宅区久等。","连续没单就暂停。"],                                                                              stepsEn:["If driving, go to Bellevue.","Don't camp residential areas.","Pause after a string of no-pings."] },
-  { id:"evening", start:990, end:1170, short:"饭点",   shortEn:"Dinner",    title:"黄金窗口",        titleEn:"Golden window",            target:"Bellevue/Kirkland", targetEn:"Bellevue/Kirkland",   tone:"good", mult:1.45, analysis:"4:30–7:30 PM 主力赚钱窗。",                                analysisEn:"4:30–7:30 PM prime earnings window.",                                                               steps:["从东区起步。","到 Bellevue 后关滤镜。","不要空车跨湖。"],                                                                                      stepsEn:["Start in the Eastside.","Drop the filter once in Bellevue.","Don't cross the lake empty."],
+  { id:"mid",     start:555, end:660,  short:"早高峰末",  shortEn:"Tapering",  title:"早高峰收尾",        titleEn:"AM rush tapering",         target:"Bellevue",          targetEn:"Bellevue",            tone:"warn", mult:1.05, analysis:"9:15–11:00 AM 需求变软。",                                  analysisEn:"9:15–11:00 AM demand softens.",                                                                     steps:["只守高密度区。","10–15 分钟没单就停或换点。","别蹲机场。"],                                                                                   stepsEn:["Only camp dense zones.","After 10–15 min idle, stop or move.","Don't stake out the airport."] },
+  { id:"lunch",   start:660, end:840,  short:"午间",     shortEn:"Lunch",     title:"午间（偏冷）",      titleEn:"Light driving",            target:"Bellevue/Kirkland", targetEn:"Bellevue/Kirkland",   tone:"warn", mult:1.00, analysis:"11:00 AM–2:00 PM 爆发弱。",                                analysisEn:"11:00 AM–2:00 PM weak surge potential.",                                                            steps:["Bellevue/Kirkland 短等。","不追 15+ 分钟 pickup。","低效就休息。"],                                                                            stepsEn:["Short waits in Bellevue/Kirkland.","Skip 15+ min pickups.","If slow, rest."] },
+  { id:"slow",    start:840, end:990,  short:"低谷",     shortEn:"Lull",      title:"低谷段",          titleEn:"Lull · avoid dry runs",    target:"Bellevue",          targetEn:"Bellevue",            tone:"warn", mult:1.05, analysis:"2:00–4:30 PM 容易低效。",                                  analysisEn:"2:00–4:30 PM tends to drag.",                                                                       steps:["必须跑就去 Bellevue。","不要在住宅区久等。","连续没单就暂停。"],                                                                              stepsEn:["If driving, go to Bellevue.","Don't camp residential areas.","Pause after a string of no-pings."] },
+  { id:"evening", start:990, end:1170, short:"晚高峰",   shortEn:"Dinner",    title:"晚高峰",          titleEn:"Golden window",            target:"Bellevue/Kirkland", targetEn:"Bellevue/Kirkland",   tone:"good", mult:1.45, analysis:"4:30–7:30 PM 主力赚钱窗。",                                analysisEn:"4:30–7:30 PM prime earnings window.",                                                               steps:["从东区起步。","到 Bellevue 后关滤镜。","不要空车跨湖。"],                                                                                      stepsEn:["Start in the Eastside.","Drop the filter once in Bellevue.","Don't cross the lake empty."],
     targetZoneIds:["bellevue","kirkland","kirklandurban","redmond","factoria","totem"], targetSides:["east"] },
-  { id:"dinner",  start:1170,end:1245, short:"饭后",   shortEn:"Post-dinner", title:"饭后继续",      titleEn:"Post-dinner push",         target:"Bellevue/SLU",      targetEn:"Bellevue/SLU",        tone:"good", mult:1.25, analysis:"7:30–8:45 PM 吃饭后 / 活动单。",                           analysisEn:"7:30–8:45 PM dinner / event runs.",                                                                 steps:["Bellevue/Kirkland 可继续。","有单带进城再跑 SLU。","没单 10 分钟换点。"],                                                                     stepsEn:["Stay in Bellevue/Kirkland.","Ride into SLU only with a fare.","After 10 idle min, move."],
+  { id:"dinner",  start:1170,end:1245, short:"饭后",     shortEn:"Post-dinner", title:"饭后段",        titleEn:"Post-dinner push",         target:"Bellevue/SLU",      targetEn:"Bellevue/SLU",        tone:"good", mult:1.25, analysis:"7:30–8:45 PM 吃饭后 / 活动单。",                           analysisEn:"7:30–8:45 PM dinner / event runs.",                                                                 steps:["Bellevue/Kirkland 可继续。","有单带进城再跑 SLU。","没单 10 分钟换点。"],                                                                     stepsEn:["Stay in Bellevue/Kirkland.","Ride into SLU only with a fare.","After 10 idle min, move."],
     targetZoneIds:["bellevue","kirkland","kirklandurban","slu","capitol","belltown","queenanne"], targetSides:["east","west"] },
-  { id:"night",   start:1245,end:1410, short:"夜场",   shortEn:"Nightlife", title:"夜生活控风险",    titleEn:"Nightlife · manage risk",  target:"Bellevue/Capitol",  targetEn:"Bellevue/Capitol Hill", tone:"warn", mult:1.10, analysis:"8:45–11:30 PM 醉酒 / 短单 / 回程风险上升。",               analysisEn:"8:45–11:30 PM drunk riders / short trips / return-leg risk all rise.",                              steps:["Bellevue 更稳，Seattle 更刺激。","只在密度好时跑城里。","11:15 后准备回家。"],                                                                stepsEn:["Bellevue is steadier, Seattle is wilder.","Only run the city when density is good.","Start heading home after 11:15."] },
-  { id:"return",  start:1410,end:1470, short:"回家",   shortEn:"Home run",  title:"开回家逻辑",      titleEn:"Switch to home-run mode",  target:"Home",              targetEn:"Home",                tone:"bad",  mult:0.95, analysis:"11:30 PM–12:30 AM 收缩战场。",                            analysisEn:"11:30 PM–12:30 AM tighten your zone.",                                                              steps:["开 Home Filter。","只接顺路 / 明显好单。","别再裸奔远区。"],                                                                                   stepsEn:["Turn on Home Filter.","Only accept fares that head your way.","Don't push to far zones."] },
-  { id:"late",    start:0,   end:150,  short:"凌晨",   shortEn:"Late",      title:"只接好单",        titleEn:"Cherry-pick only",         target:"Home",              targetEn:"Home",                tone:"bad",  mult:0.90, analysis:"12:00–2:30 AM 风险和疲劳都高。",                          analysisEn:"12:00–2:30 AM both risk and fatigue spike.",                                                        steps:["Home Filter。","不接麻烦 pickup。","无明显加价就收。"],                                                                                       stepsEn:["Home Filter on.","Skip messy pickups.","No surge → call it a night."] }
+  { id:"night",   start:1245,end:1410, short:"夜场",     shortEn:"Nightlife", title:"夜场",            titleEn:"Nightlife · manage risk",  target:"Bellevue/Capitol",  targetEn:"Bellevue/Capitol Hill", tone:"warn", mult:1.10, analysis:"8:45–11:30 PM 醉酒 / 短单 / 回程风险上升。",               analysisEn:"8:45–11:30 PM drunk riders / short trips / return-leg risk all rise.",                              steps:["Bellevue 更稳，Seattle 更刺激。","只在密度好时跑城里。","11:15 后准备回家。"],                                                                stepsEn:["Bellevue is steadier, Seattle is wilder.","Only run the city when density is good.","Start heading home after 11:15."] },
+  { id:"return",  start:1410,end:1470, short:"收工",     shortEn:"Home run",  title:"收工段",          titleEn:"Switch to home-run mode",  target:"Home",              targetEn:"Home",                tone:"bad",  mult:0.95, analysis:"11:30 PM–12:30 AM 收缩战场。",                            analysisEn:"11:30 PM–12:30 AM tighten your zone.",                                                              steps:["开 Home Filter。","只接顺路 / 明显好单。","别再裸奔远区。"],                                                                                   stepsEn:["Turn on Home Filter.","Only accept fares that head your way.","Don't push to far zones."] },
+  { id:"late",    start:0,   end:150,  short:"凌晨",     shortEn:"Late",      title:"凌晨（只接好单）", titleEn:"Cherry-pick only",         target:"Home",              targetEn:"Home",                tone:"bad",  mult:0.90, analysis:"12:00–2:30 AM 风险和疲劳都高。",                          analysisEn:"12:00–2:30 AM both risk and fatigue spike.",                                                        steps:["Home Filter。","不接麻烦 pickup。","无明显加价就收。"],                                                                                       stepsEn:["Home Filter on.","Skip messy pickups.","No surge → call it a night."] }
 ];
 
 /* =========================================================
@@ -2863,6 +2863,9 @@ const DEFAULT_STATE = {
   endOfDayPrompted: false,
   todayTarget: null,             // null = no target set; otherwise integer (e.g. current+1, current+2)
   todayTargetSetAt: null,
+  // V8.34.2: when 4 AM rolls over while driver is mid-trip, defer the day
+  // reset until the trip completes. Stored as a dayKey string (e.g. "2026-05-04").
+  pendingDayRollover: null,
   // V8.20: trip log — auto-recorded list of trips for review
   // Each entry: {id, type, acceptedAt, endedAt, durationMin, gapMin,
   //              pickupZoneId, pickupZoneShort, pickupLat, pickupLng, sessionDate,
@@ -2918,6 +2921,12 @@ const DEFAULT_STATE = {
     // V7.7: cancellation tracking — separate from completed trips
     todayCancellations: 0,
     lastCancelMinutes: null,
+    // V8.34.2: cancellation reason — one of "passengerCancelled", "noShow",
+    // "driverCancelled", "beforePickup", "duringTrip", "unknown".
+    lastCancelReason: null,
+    // V8.34.2: no-shows tracked separately from generic cancellations because
+    // they're structurally different (signal about pickup quality, not rider intent).
+    todayNoShows: 0,
     // V8.27.7.3: cumulative wait minutes across pause/resume cycles in the SAME spot.
     // currentWaitStartedAt only tracks the CURRENT continuous segment. When driver
     // pauses, we add the segment's elapsed minutes here. On resume, currentWaitStartedAt
@@ -2973,6 +2982,42 @@ function dayKey(d){
   return adj.toISOString().slice(0,10);
 }
 
+/* V8.34.2: full day-rollover behavior, callable both inline (load path) and
+   deferred (after onTrip ends if rollover happened mid-trip). Idempotent —
+   if today already matches sessionDate, this is a no-op. */
+function performDayReset(targetDay){
+  const today = targetDay || dayKey();
+  if (state.sessionDate === today) return;
+  state.sessionDate = today;
+  state.filterLeft = 2;
+  state.homeFilter = { active:false, startedAt:null, chargedThisSession:false, routeMode:"choose", harvestStopsCount:0, directHomeStartedAt:null };
+  state.income = "unknown";
+  state.waitStage = 0;
+  if (state.panic !== "goHome") state.panic = "normal";
+  state.goodSpotNoPingCount = 0;
+  state.flags.airport = false;
+  state.flags.event = false;
+  state.flags.rain = false;
+  state.flagExpiry = { rain:0, event:0, airport:0 };
+  state.reminders.lastSegmentKey = null;
+  state.arrivedZoneId = null;
+  state.arrivedAt = null;
+  state.currentZoneOverride = null;
+  state.locationAccuracy = null;
+  state.locationUpdatedAt = null;
+  state.locationSource = "home";
+  state.trip = deepClone(DEFAULT_STATE.trip);
+  state.mode = "preTrip";
+  state.subContext = deepClone(DEFAULT_STATE.subContext);
+  state.reminders.waitEnd = null;
+  state.reminders.waitAlerted = false;
+  state.endOfDayPrompted = false;
+  state.todayTarget = null;
+  state.todayTargetSetAt = null;
+  // Clear deferred rollover marker since we just executed it
+  state.pendingDayRollover = null;
+}
+
 /* =========================================================
    V7 mode migration
    Maps legacy panic/waitStage/trip.status to one of:
@@ -2997,6 +3042,23 @@ function migrateStateToV7(){
    isAtHome(zone) compares a zone-or-coords to home.
    setHome(payload) saves and marks onboarding done.
    ========================================================= */
+/* V8.34.2: unified read of Destination Filter state.
+   Pre-V8.34.2 there were 89 raw reads of state.homeFilter.* and
+   state.subContext.homeFilterActive scattered through the codebase. New
+   callers (advisor / goHome / backup picks) should use this helper so any
+   future Filter changes (e.g. multi-platform Filter) only touch one place. */
+function getDestinationFilterContext(){
+  const hf = state.homeFilter || {};
+  const sc = state.subContext || {};
+  return {
+    active: !!(hf.active || sc.homeFilterActive),
+    target: "home",
+    startedAt: hf.startedAt || sc.homeFilterStartedAt || null,
+    chargedThisSession: !!hf.chargedThisSession,
+    routeMode: hf.routeMode || "choose"
+  };
+}
+
 function getHome(){
   if (state.homeZone && typeof state.homeZone.lat === "number") return state.homeZone;
   // V7.3: lazy setup — null is a valid "no home set" state.
@@ -3370,40 +3432,18 @@ function load(){
   }
 
   // Day reset (4 AM boundary)
+  // V8.34.2: extracted to performDayReset() for reuse from
+  // completeCurrentTrip when a deferred rollover is pending.
   const today = dayKey();
   if (state.sessionDate !== today) {
-    state.sessionDate = today;
-    state.filterLeft = 2;
-    // V7.8/V7.9: reset Filter session on day boundary
-    state.homeFilter = { active:false, startedAt:null, chargedThisSession:false, routeMode:"choose", harvestStopsCount:0, directHomeStartedAt:null };
-    state.income = "unknown";
-    state.waitStage = 0;
-    if (state.panic !== "goHome") state.panic = "normal";
-    state.goodSpotNoPingCount = 0;
-    state.flags.airport = false;
-    state.flags.event = false;
-    state.flags.rain = false;
-    state.flagExpiry = { rain:0, event:0, airport:0 };
-    state.reminders.lastSegmentKey = null;
-    state.arrivedZoneId = null;
-    state.arrivedAt = null;
-    state.currentZoneOverride = null;
-    state.locationAccuracy = null;
-    state.locationUpdatedAt = null;
-    state.locationSource = "home";
-    state.trip = deepClone(DEFAULT_STATE.trip);
-    // V7: day reset clears mode + subContext, but keep theme & autoLocate prefs
-    // V7.3: homeZone is user setup, never reset on day boundary
-    state.mode = "preTrip";
-    state.subContext = deepClone(DEFAULT_STATE.subContext);
-    // V8.14: also clear any stale wait-countdown reminders from prior day.
-    // Otherwise a wait that crossed 4am would leave waitEnd set in preTrip mode.
-    state.reminders.waitEnd = null;
-    state.reminders.waitAlerted = false;
-    // V8.19: clear end-of-day prompt + soft target — fresh day, fresh decisions
-    state.endOfDayPrompted = false;
-    state.todayTarget = null;
-    state.todayTargetSetAt = null;
+    // V8.34.2: protect the active trip — if the driver accepted at 3:50 AM
+    // and is still onTrip when 4 AM rolls around, do NOT clear the trip.
+    // Mark a pending rollover; it will fire when the trip completes.
+    if (state.mode === "onTrip" && state.trip && state.trip.currentTripAcceptedAt) {
+      state.pendingDayRollover = today;
+    } else {
+      performDayReset(today);
+    }
   }
 
   // Idle reset (90 min no interaction)
@@ -4661,6 +4701,97 @@ function useMyLocation(){
   );
 }
 
+/* =========================================================
+   V8.34.2: GPS refresh wrappers — two tiers.
+
+   Auto tier (refreshGpsAuto):
+   - Used by endTrip / repair flows that don't need user interaction.
+   - Fire-and-forget; never blocks UI; never opens modals.
+   - On success with good accuracy → updates state.current + locationAccuracy.
+   - On failure / poor accuracy → silent; just resolves with ok:false.
+   - Caller decides what to do (e.g. drop-off advisor uses cached, then nudges
+     when async result lands).
+
+   Repair tier (refreshGpsForRepair):
+   - Used when user actively asks "I'm somewhere else now."
+   - Returns a Promise<{ok, accuracy, coords?, reason?}>.
+   - Caller is expected to handle ok:false by opening manual picker.
+   - On poor accuracy (>200m) returns ok:false + reason:"rough" so caller
+     can offer manual confirm.
+
+   Both wrappers use enableHighAccuracy:true / timeout:12000 / maximumAge:15000.
+   They DO NOT call showBanner directly — the caller decides the message.
+   ========================================================= */
+function refreshGpsAuto(callback){
+  // Fire-and-forget. callback(result) is optional.
+  if (!navigator || !navigator.geolocation) {
+    if (callback) callback({ ok:false, reason:"no-geo" });
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const acc = (pos.coords && typeof pos.coords.accuracy === "number") ? pos.coords.accuracy : null;
+      // Always update locationAccuracy so the rough-location indicator can show.
+      state.locationAccuracy = acc;
+      if (acc != null && acc > 200) {
+        // Poor accuracy — don't overwrite cached location, but record the timestamp
+        // and accuracy so UI can flag "📍 定位粗略".
+        state.locationUpdatedAt = Date.now();
+        save();
+        if (callback) callback({ ok:false, reason:"rough", accuracy:acc });
+        return;
+      }
+      // Good accuracy — update coords
+      state.current = { lat: pos.coords.latitude, lng: pos.coords.longitude,
+                        label: state.current && state.current.label ? state.current.label : "当前位置" };
+      state.locationUpdatedAt = Date.now();
+      state.locationSource = (acc != null && acc <= 80) ? "gps" : "gps-rough";
+      save();
+      if (callback) callback({ ok:true, accuracy:acc, coords: state.current });
+    },
+    err => {
+      // Silent on failure — auto flow doesn't interrupt the user.
+      if (callback) callback({ ok:false, reason:"error", code: err && err.code });
+    },
+    { enableHighAccuracy:true, timeout:12000, maximumAge:15000 }
+  );
+}
+
+function refreshGpsForRepair(){
+  // Promise-based for the repair flow which awaits the result.
+  return new Promise(resolve => {
+    if (!navigator || !navigator.geolocation) {
+      resolve({ ok:false, reason:"no-geo" });
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        const acc = (pos.coords && typeof pos.coords.accuracy === "number") ? pos.coords.accuracy : null;
+        state.locationAccuracy = acc;
+        if (acc != null && acc > 200) {
+          // Caller will show "定位不准，请手动确认".
+          state.locationUpdatedAt = Date.now();
+          save();
+          resolve({ ok:false, reason:"rough", accuracy:acc,
+                    coords:{ lat: pos.coords.latitude, lng: pos.coords.longitude } });
+          return;
+        }
+        state.current = { lat: pos.coords.latitude, lng: pos.coords.longitude,
+                          label: state.current && state.current.label ? state.current.label : "当前位置" };
+        state.locationUpdatedAt = Date.now();
+        state.locationSource = (acc != null && acc <= 80) ? "gps" : "gps-rough";
+        save();
+        resolve({ ok:true, accuracy:acc, coords: state.current });
+      },
+      err => {
+        // Caller will show "GPS 没拿到，请手动选择区域".
+        resolve({ ok:false, reason:"error", code: err && err.code });
+      },
+      { enableHighAccuracy:true, timeout:12000, maximumAge:15000 }
+    );
+  });
+}
+
 /* V7.4: when GPS fails, open a manual location picker modal */
 function openLocationPicker(title, reason){
   const en = currentLang() === "en";
@@ -5272,9 +5403,13 @@ function acceptTrip(){
   showBanner(baseTitle, baseBody + filterNote, "good", 4500);
 }
 
+/* V8.34.2: endTrip is now an entry point that asks "Plain end vs end+next?".
+   Real-life rideshare: drivers regularly get a back-to-back ping during the
+   final 30s of a trip. They tap End on the first ride and the second ride is
+   already accepted in Uber Driver — but RidePilot used to drop them back to
+   preTrip and hide the onTrip card. Now we ask. */
 function endTrip(){
   touch();
-  const now = Date.now();
   if (state.mode !== "onTrip") {
     const enX = currentLang() === "en";
     showBanner(
@@ -5283,6 +5418,27 @@ function endTrip(){
       "warn", 2500);
     return;
   }
+  const en = currentLang() === "en";
+  showBanner(
+    en ? "Trip done?" : "这单结束了吗？",
+    en ? "If you got a back-to-back, tap 'End + next ride'."
+       : "如果连环单接上了，点「结束并接下一单」。",
+    "good", 30000, [
+      { label: en ? "Plain end" : "普通结束",
+        cls: "primary",
+        onClick: () => completeCurrentTripAndReturn() },
+      { label: en ? "End + next ride" : "结束并接下一单",
+        cls: "good",
+        onClick: () => completeCurrentTripAndContinue() }
+    ]);
+}
+
+/* V8.34.2: split endTrip into reusable pieces.
+   completeCurrentTrip: bookkeeping for the trip that just ended.
+   completeCurrentTripAndReturn: the old endTrip behavior (→ preTrip + advisor).
+   completeCurrentTripAndContinue: back-to-back (→ stay onTrip with new accept). */
+function completeCurrentTrip(){
+  const now = Date.now();
   state.trip.status = "idle";
   state.trip.currentTripEndedAt = now;
   state.trip.lastTripEndedAt = now;
@@ -5294,17 +5450,48 @@ function endTrip(){
   state.trip.todayTrips += 1;
   state.trip.currentTripAcceptedAt = null;
   state.trip.currentWaitStartedAt = null;
-  // V8.27.7.3: trip ended → wait history at the previous spot is no longer
-  // relevant (driver will be in a new place). Reset cumulative.
   state.trip.cumulativeWaitMin = 0;
   state.trip.segmentBridgePromptedFor = null;
-  state.arrivedZoneId = null;
-  state.currentZoneOverride = null;
-  state.locationSource = state.locationAccuracy != null && state.locationAccuracy <= 80 ? "gps" : "home";
   // V8.20: log this trip end (find open entry from logStartTrip and complete it)
   logEndTrip();
-  // V8.19: if a target was set and we just hit it, show a celebration banner
-  // (one-shot — only when crossing from below to at-or-above)
+  // V8.34.2: clear pending day rollover if any — a completed trip is a safe
+  // moment to flush the deferred reset.
+  if (state.pendingDayRollover && typeof performDayReset === "function") {
+    state.pendingDayRollover = null;
+    try { performDayReset(); } catch(e){}
+  }
+}
+
+function completeCurrentTripAndReturn(){
+  const wasOnTrip = state.mode === "onTrip";
+  if (!wasOnTrip) return;
+  completeCurrentTrip();
+  state.arrivedZoneId = null;
+  state.currentZoneOverride = null;
+  // V8.34.2: B-flow GPS — kick off async refresh (fire-and-forget). The cached
+  // zone is what we use for the immediate advisor; the async result will fire
+  // a "location updated" correction banner if the actual GPS zone differs.
+  const cachedZoneIdAtEnd = (typeof nearestZone === "function" && state.current)
+    ? (nearestZone(state.current) || {}).id
+    : null;
+  refreshGpsAuto(result => {
+    if (!result || !result.ok) return;
+    // GPS came back — check if the zone differs from what we used for advisor
+    const newZone = (typeof nearestZone === "function") ? nearestZone(state.current) : null;
+    if (!newZone || newZone.id === cachedZoneIdAtEnd) return;
+    // Differ — surface correction banner
+    const en = currentLang() === "en";
+    showBanner(
+      en ? `Location updated: you're actually in ${newZone.short}` : `位置更新：你实际在 ${newZone.short}`,
+      en ? "Earlier drop-off advice may be off — re-check?" : "刚才的落点判断可能不准。要不要重新判断？",
+      "warn", 30000, [
+        { label: en ? "Re-check" : "重新判断", cls:"primary", onClick: () => {
+            try { showDropOffAdvisor(); } catch(e){}
+          } },
+        { label: en ? "Ignore"   : "忽略",     cls:"ghost",   onClick: () => {} }
+      ]);
+  });
+
   const justReachedTarget = state.todayTarget != null
     && state.trip.todayTrips === state.todayTarget;
   enterMode("preTrip");
@@ -5316,12 +5503,6 @@ function endTrip(){
     enE ? "Trip ended" : "单已结束",
     enE ? `${dur} min trip · ${td} trip${td !== 1 ? "s" : ""} today` : `本单 ${dur} 分钟 · 今日 ${td} 单`,
     "good", 5000);
-  // V8.34: drop-off advisor — surface a contextual banner when the drop-off
-  // location is notably weak (remote zone) or strong (good for current segment).
-  // Driver feedback that motivated this: "每单结束后不知道下一步" — endTrip
-  // returning to a generic preTrip card misses the most actionable moment of
-  // the day (just dropped off, must decide what's next). 800ms delay so it
-  // shows AFTER the "Trip ended" banner.
   setTimeout(() => { try { showDropOffAdvisor(); } catch(e){} }, 800);
   if (justReachedTarget) {
     const en = currentLang() === "en";
@@ -5329,15 +5510,40 @@ function endTrip(){
       showBanner(
         en ? `Target reached: ${state.todayTarget} trips ✓` : `目标达成 · 今日 ${state.todayTarget} 单 ✓`,
         en ? "Keep going or wrap up?" : "继续跑还是收工？",
-        "good",
-        60000,
+        "good", 60000,
         [
           { label: en ? "Keep going" : "继续跑", cls: "good",  onClick: () => {} },
           { label: en ? "Wrap up"   : "收工",    cls: "ghost", onClick: () => enterGoHomeMode("choose") }
-        ]
-      );
-    }, 5500);  // delay slightly so it doesn't overlap with the "单已结束" banner
+        ]);
+    }, 5500);
   }
+}
+
+function completeCurrentTripAndContinue(){
+  // Back-to-back: complete the trip but immediately enter the next one. Stay
+  // in onTrip; do NOT drop to preTrip; do NOT show drop-off advisor; do NOT
+  // refresh GPS (next pickup is somewhere else, the question is moot).
+  if (state.mode !== "onTrip") return;
+  completeCurrentTrip();
+  // Kick off the next trip immediately
+  state.trip.status = "onTrip";
+  state.trip.currentTripAcceptedAt = Date.now();
+  state.trip._overduePrompted = false;
+  // arrivedZoneId is no longer meaningful for the next trip
+  state.arrivedZoneId = null;
+  state.currentZoneOverride = null;
+  // Do NOT call enterMode — we're already in onTrip and the transition banner
+  // would be wrong ("接单成功" was already shown for the previous trip).
+  state.mode = "onTrip";
+  save();
+  render();
+  const en = currentLang() === "en";
+  const td = state.trip.todayTrips;
+  showBanner(
+    en ? "Next ride" : "已进入下一单",
+    en ? `${td} trip${td !== 1 ? "s" : ""} done · clock running for the next one`
+       : `今日 ${td} 单完成 · 下一单已开始计时`,
+    "good", 4000);
 }
 
 /* V7.7: Cancel an accepted trip (rider canceled, no-show, etc).
@@ -5353,52 +5559,173 @@ function cancelTrip(){
     return;
   }
   const en = currentLang() === "en";
-  const elapsed = state.trip.currentTripAcceptedAt
-    ? Math.max(0, Math.round((Date.now() - state.trip.currentTripAcceptedAt) / 60000))
-    : 0;
-  const title = en ? "Cancel this trip?" : "取消这一单？";
-  const body = en
-    ? `Already ${elapsed} min in. Won't count toward today's trips.`
-    : `已接单 ${elapsed} 分钟。不会计入今日完成单数。`;
-  showBanner(title, body, "warn", 60000, [
-    { label: en ? "Confirm cancel" : "确认取消", cls:"bad", onClick: () => confirmCancelTrip() },
-    { label: en ? "Keep going" : "继续跑单",     cls:"ghost", onClick: () => {} }
-  ]);
+  // V8.34.2: pick reason BEFORE confirming. No-show is structurally different
+  // from passenger-cancelled (different intent, different downstream signal),
+  // and we want the data for income diagnosis later. Driver-cancelled is also
+  // tracked separately because it tells us about the driver's own behavior.
+  showBanner(
+    en ? "What kind of cancel?" : "这次属于哪种？",
+    en ? "Pick the closest one." : "选最接近的那个。",
+    "warn", 60000, [
+      { label: en ? "Rider cancelled" : "乘客取消",
+        cls:"warn", onClick: () => confirmCancelTrip("passengerCancelled") },
+      { label: en ? "No-show" : "No-show",
+        cls:"warn", onClick: () => confirmCancelTrip("noShow") },
+      { label: en ? "I cancelled" : "我取消了",
+        cls:"warn", onClick: () => confirmCancelTrip("driverCancelled") },
+      { label: en ? "Other" : "其他",
+        cls:"ghost", onClick: () => confirmCancelTrip("unknown") },
+      { label: en ? "Never mind" : "算了",
+        cls:"ghost", onClick: () => {} }
+    ]);
 }
 
-function confirmCancelTrip(){
+function confirmCancelTrip(reason){
   touch();
   const now = Date.now();
   if (state.mode !== "onTrip") return;
+  // V8.34.2: validate reason against the documented enum
+  const validReasons = ["passengerCancelled", "noShow", "driverCancelled",
+                        "beforePickup", "duringTrip", "unknown"];
+  const cancelReason = validReasons.includes(reason) ? reason : "unknown";
   let dur = 0;
   if (state.trip.currentTripAcceptedAt) {
     dur = Math.max(0, Math.round((now - state.trip.currentTripAcceptedAt) / 60000));
   }
   state.trip.lastCancelMinutes = dur;
+  state.trip.lastCancelReason = cancelReason;
   state.trip.todayCancellations = (state.trip.todayCancellations || 0) + 1;
+  // V8.34.2: track no-shows separately — they're structurally different from
+  // a "rider changed their mind" cancel, and downstream income diagnosis will
+  // want to surface them.
+  if (cancelReason === "noShow") {
+    state.trip.todayNoShows = (state.trip.todayNoShows || 0) + 1;
+  }
   state.trip.status = "idle";
   state.trip.currentTripAcceptedAt = null;
   state.trip.currentTripEndedAt = now;
   state.trip.lastTripEndedAt = now;
-  // V7.7: cancellation does NOT increment todayTrips or todayTotalTripMinutes.
-  // It does record lastCancelMinutes, separate from gap.
   state.trip.currentWaitStartedAt = null;
-  // V8.27.7.3: cancel ends the wait scope — clear cumulative for fresh start.
   state.trip.cumulativeWaitMin = 0;
   state.trip.segmentBridgePromptedFor = null;
   state.arrivedZoneId = null;
   state.currentZoneOverride = null;
-  // V8.20: log this cancellation (converts the open trip entry to type:cancel)
-  logCancel();
+  // V8.20: log this cancellation. Pass reason if logCancel signature supports it.
+  try {
+    if (logCancel.length >= 1) {
+      logCancel(cancelReason);
+    } else {
+      logCancel();
+    }
+  } catch(e){ try { logCancel(); } catch(e2){} }
   enterMode("preTrip");
   render();
   const en = currentLang() === "en";
+  const reasonLabel = en ? {
+    passengerCancelled: "Rider cancelled",
+    noShow: "No-show",
+    driverCancelled: "I cancelled",
+    beforePickup: "Before pickup",
+    duringTrip: "During trip",
+    unknown: "Cancelled"
+  }[cancelReason] : {
+    passengerCancelled: "乘客取消",
+    noShow: "No-show",
+    driverCancelled: "我取消了",
+    beforePickup: "未接到人前",
+    duringTrip: "途中取消",
+    unknown: "已取消"
+  }[cancelReason];
   showBanner(
-    en ? "Trip canceled" : "单已取消",
-    en ? `${dur} min lost · ${state.trip.todayCancellations} cancels today`
-       : `损失 ${dur} 分钟 · 今日已取消 ${state.trip.todayCancellations} 次`,
+    reasonLabel,
+    en ? `${dur} min · ${state.trip.todayCancellations} cancel${state.trip.todayCancellations !== 1 ? "s" : ""} today`
+       : `${dur} 分钟 · 今日 ${state.trip.todayCancellations} 次取消`,
     "warn", 4500
   );
+}
+
+/* V8.34.1: undoAccept — driver accepted by mistake (e.g. misclicked the
+   global "📱 平台接到单了？" pill, or accidentally tapped 「我接到单了」).
+   This is DIFFERENT from cancelTrip:
+   - cancelTrip: trip really was accepted then cancelled by rider/driver →
+                 records a cancellation, increments todayCancellations
+   - undoAccept: trip was never really accepted → rollback the state change
+                 entirely, do NOT record a cancellation.
+   Only allowed within a short window after acceptTrip (3 minutes). After
+   that, the rollback is too risky — driver should use cancelTrip instead. */
+function undoAccept(){
+  touch();
+  if (state.mode !== "onTrip") {
+    const enU = currentLang() === "en";
+    showBanner(
+      enU ? "Not on a trip" : "现在没在跑单",
+      "", "warn", 2000);
+    return;
+  }
+  const acceptedAt = state.trip && state.trip.currentTripAcceptedAt;
+  const elapsedMin = acceptedAt ? Math.floor((Date.now() - acceptedAt) / 60000) : 999;
+  const en = currentLang() === "en";
+  if (elapsedMin > 3) {
+    // Too late — direct them to cancelTrip
+    showBanner(
+      en ? "Already a few minutes in" : "已经接单几分钟了",
+      en ? "If the trip didn't actually happen, use 'Trip cancelled' instead."
+         : "如果其实没跑，用「订单取消」更准确。",
+      "warn", 4000);
+    return;
+  }
+  // Short confirmation
+  showBanner(
+    en ? "Undo accept?" : "撤销刚才的接单？",
+    en ? "Treats it as if you never tapped accept. No cancellation recorded."
+       : "当作没接过单。不会记录为取消。",
+    "warn", 30000, [
+      { label: en ? "Yes, undo"  : "是的，撤销", cls:"warn",  onClick: () => doUndoAccept() },
+      { label: en ? "Keep trip" : "保留",         cls:"ghost", onClick: () => {} }
+    ]);
+}
+
+function doUndoAccept(){
+  // Roll back the state changes acceptTrip made. Specifically:
+  // - mode → preTrip (was onTrip)
+  // - trip.status → idle
+  // - trip.currentTripAcceptedAt → null
+  // - DO NOT increment todayCancellations
+  // - DO NOT alter todayTrips
+  // - DO clear the gap that acceptTrip recorded into todayTotalGapMinutes
+  //   (since this acceptance never really happened)
+  if (state.mode !== "onTrip") return;
+  if (state.trip) {
+    if (typeof state.trip.lastGapMinutes === "number" && state.trip.lastGapMinutes > 0) {
+      state.trip.todayTotalGapMinutes = Math.max(0,
+        (state.trip.todayTotalGapMinutes || 0) - state.trip.lastGapMinutes);
+      state.trip.lastGapMinutes = null;
+    }
+    state.trip.status = "idle";
+    state.trip.currentTripAcceptedAt = null;
+    state.trip._overduePrompted = false;
+  }
+  // V8.20: also remove the open log entry that logStartTrip just created
+  if (typeof undoLastStartTrip === "function") {
+    try { undoLastStartTrip(); } catch(e){}
+  } else if (Array.isArray(state.tripLog) && state.tripLog.length > 0) {
+    // Fallback: remove the most recent open entry (no endTime, no cancelled flag)
+    for (let i = state.tripLog.length - 1; i >= 0; i--) {
+      const e = state.tripLog[i];
+      if (e && !e.endTime && !e.cancelled && e.type === "trip") {
+        state.tripLog.splice(i, 1);
+        break;
+      }
+    }
+  }
+  enterMode("preTrip");
+  save();
+  render();
+  const en = currentLang() === "en";
+  showBanner(
+    en ? "Undone" : "已撤销",
+    en ? "Back to before the accept tap." : "回到接单之前的状态。",
+    "good", 2500);
 }
 
 /* "位置不错，但没单" — escalating advice based on count. */
@@ -7734,6 +8061,8 @@ function checkTimers(){
   // V8.34: onTrip overdue advisor — fire if onTrip has been running unusually
   // long without an endTrip tap. Self-deduplicates via state.trip._overduePrompted.
   try { maybeShowOnTripOverduePrompt(); } catch(e){}
+  // V8.34.2: enRoute pause timeout — gentle nudge at 20 min, stronger at 45 min.
+  try { maybeShowEnRoutePauseReminder(); } catch(e){}
 
   if (state.reminders.waitEnd) {
     const left = state.reminders.waitEnd - Date.now();
@@ -9907,7 +10236,17 @@ function computeUiState(){
       body:  en
         ? "Your trip is being recorded.\nFinish safely, then I'll help you back into the flow."
         : "行程已经开始记录。\n安全送达后，再回到接单节奏。",
-      buttonLabel: en ? "Trip done" : "完成本单"
+      buttonLabel: en ? "Trip done" : "完成本单",
+      // V8.34.1: real-life onTrip needs more than just "trip done":
+      //   - Rider cancelled, driver cancelled, no-show → "订单取消" (doesn't count as completed)
+      //   - Driver tapped accept by mistake / pill misclick → "我点错了" (undo)
+      // Pre-V8.34.1 the only escape was the global "状态不对？" reset, which was
+      // confusingly wide — it cleared cumulative wait, etc. These dedicated
+      // options keep state surgical.
+      secondaryActionId: "cancelTrip",
+      secondaryLabel: en ? "Trip cancelled" : "订单取消",
+      tertiaryActionId: "undoAccept",
+      tertiaryLabel: en ? "I tapped by mistake" : "我点错了，撤销"
     };
   }
 
@@ -10427,6 +10766,9 @@ function onSecondaryBtnTap(){
     case "pauseEnRoute":     return pauseEnRoute();
     case "resumeEnRoute":    return resumeEnRoute();
     case "waitHere":         return waitHereInsteadOfEnRoute();
+    // V8.34.1: onTrip secondary/tertiary (cancel + undo)
+    case "cancelTrip":       return cancelTrip();
+    case "undoAccept":       return undoAccept();
   }
 }
 
@@ -10471,6 +10813,9 @@ function onTertiaryBtnTap(){
     case "pauseEnRoute":   return pauseEnRoute();
     case "resumeEnRoute":  return resumeEnRoute();
     case "waitHere":       return waitHereInsteadOfEnRoute();
+    // V8.34.1: onTrip tertiary
+    case "cancelTrip":     return cancelTrip();
+    case "undoAccept":     return undoAccept();
   }
 }
 
@@ -10490,22 +10835,169 @@ function onTertiaryBtnTap(){
    confusing state. The escape is intentionally subtle (small dotted
    underline, opacity .55) to discourage impulsive resets.
    ========================================================= */
+/* V8.34.1: rewritten — was a reset-confirmation dialog, now a context-aware
+   REPAIR MENU. The right repair depends on what's actually wrong:
+   - "I got a ride on the platform" → acceptTrip (quick path to onTrip)
+   - "The trip already ended" → endTrip (only if mode === onTrip)
+   - "I'm somewhere else now" → re-read GPS, return to preTrip silently
+   - "Reset everything in this flow" → doResetFlow (the old behavior, last resort)
+   Context determines which options show. Driver complaint that motivated this:
+   "状态不对？点完了只能点重置取消，这都是明显的交互问题." */
 function onResetFlowTap(){
   touch();
   const en = currentLang() === "en";
+  const opts = [];
+
+  // Option 1: in any mode where they could possibly have gotten a ride
+  // outside RidePilot (so all non-onTrip states), offer the quick-accept.
+  if (state.mode !== "onTrip") {
+    opts.push({
+      label: en ? "I got a ride" : "我接到单了",
+      cls: "primary",
+      onClick: () => acceptTrip()
+    });
+  }
+
+  // Option 2: if currently onTrip, they may have forgotten to tap endTrip.
+  if (state.mode === "onTrip") {
+    opts.push({
+      label: en ? "The trip ended" : "单已经结束了",
+      cls: "primary",
+      onClick: () => endTrip()
+    });
+  }
+
+  // Option 3: location desync — most useful when driver moved physically but
+  // RidePilot still thinks they're in the old zone.
+  opts.push({
+    label: en ? "I'm somewhere else now" : "我现在在别的地方了",
+    cls: "ghost",
+    onClick: () => repairLocation()
+  });
+
+  // Option 4: nuclear reset — last in the list, framed as "start over."
+  opts.push({
+    label: en ? "Start over (keep today's data)" : "完全重置（保留今日数据）",
+    cls: "ghost",
+    onClick: () => doResetFlow()
+  });
+
+  // Option 5: cancel — let them back out.
+  opts.push({
+    label: en ? "Never mind" : "算了",
+    cls: "ghost",
+    onClick: () => {}
+  });
+
   showBanner(
-    en ? "Reset current flow?" : "重置当前流程？",
-    en ? "Today's records (trips, cancels, waits, target, prefs) will be kept."
-       : "今日单数、取消、等待记录不会丢。偏好和目标也保留。",
-    "warn", 30000,
-    [
-      { label: en ? "Reset" : "确认重置",
-        cls: "warn",
-        onClick: () => doResetFlow() },
-      { label: en ? "Cancel" : "取消",
-        cls: "ghost",
-        onClick: () => {} }
-    ]);
+    en ? "What's off?" : "哪里不对？",
+    en ? "Pick the closest one — I'll fix the state without losing today's records."
+       : "选最接近的那个 — 今日数据不会丢。",
+    "warn", 60000, opts);
+}
+
+/* V8.34.1: repairLocation — driver says "I'm somewhere else now."
+   Re-read GPS, re-judge zone, but keep the current mode where it makes sense.
+   In waiting/enRoute, the location matters but the activity doesn't change;
+   only force preTrip if the mode itself was the confused thing. */
+/* V8.34.2: repairLocation rewritten — must actually call GPS, not just clear
+   override. Pre-V8.34.2 we set locationSource and showed "Using your current
+   GPS" which was misleading: no GPS call was actually made. Now we await the
+   real GPS and handle failure / rough-accuracy cases honestly. */
+async function repairLocation(){
+  touch();
+  const en = currentLang() === "en";
+  // Show "locating…" feedback so the user knows something is happening.
+  showBanner(
+    en ? "Locating…" : "定位中…",
+    en ? "Reading your current GPS." : "正在读取当前 GPS。",
+    "warn", 4000);
+
+  let result;
+  try {
+    result = await refreshGpsForRepair();
+  } catch(e) {
+    result = { ok:false, reason:"error" };
+  }
+
+  if (!result.ok && result.reason === "no-geo") {
+    // Browser doesn't expose geolocation — open the manual picker
+    openLocationPicker(
+      en ? "GPS not available" : "无法获取定位",
+      en ? "Pick your current zone manually." : "请手动选择当前区域。");
+    return;
+  }
+  if (!result.ok && result.reason === "error") {
+    // GPS failed — be honest, don't pretend success. Open manual picker.
+    showBanner(
+      en ? "GPS unavailable" : "GPS 没拿到",
+      en ? "Pick your current zone manually." : "请手动选择区域。",
+      "warn", 4000);
+    setTimeout(() => {
+      openLocationPicker(
+        en ? "Pick your zone" : "选择当前区域",
+        en ? "GPS didn't return — pick the closest zone." : "GPS 没返回，请选最近的区域。");
+    }, 800);
+    return;
+  }
+  if (!result.ok && result.reason === "rough") {
+    // Got a fix but it's too rough. Tell the user honestly + offer manual pick.
+    const accTxt = result.accuracy != null
+      ? (en ? `~${Math.round(result.accuracy)}m accuracy` : `精度 ${Math.round(result.accuracy)}m`)
+      : (en ? "low accuracy" : "精度差");
+    showBanner(
+      en ? "Location is rough" : "定位不准",
+      en ? `${accTxt} · please confirm your zone manually.`
+         : `${accTxt}，请手动确认你在哪个区域。`,
+      "warn", 5000);
+    setTimeout(() => {
+      openLocationPicker(
+        en ? "Confirm your zone" : "确认当前区域",
+        en ? "GPS isn't precise enough — pick the closest zone."
+           : "GPS 精度不够，请选最近的区域。");
+    }, 800);
+    return;
+  }
+
+  // Success — now apply mode-specific cleanup and re-render based on the
+  // actually-updated location.
+  state.arrivedZoneId = null;
+  state.currentZoneOverride = null;
+
+  if (state.mode === "enRoute" && state.subContext) {
+    state.subContext.enRouteDest = null;
+    state.subContext.enRouteStartedAt = null;
+    state.subContext.enRouteEta = null;
+    state.subContext.enRouteOriginZoneId = null;
+    state.subContext.enRoutePaused = false;
+    state.subContext.enRoutePausedAt = null;
+    enterMode("preTrip");
+  }
+  if (state.mode === "waiting") {
+    if (state.reminders) {
+      state.reminders.waitEnd = null;
+      state.reminders.waitAlerted = false;
+    }
+    if (state.trip) {
+      state.trip.currentWaitStartedAt = null;
+      // V8.34.2: cumulative wait is REAL evidence — even if it was attributed
+      // to the wrong zone, the time still counts as "this driver waited X min."
+      // Do NOT reset cumulativeWaitMin here.
+    }
+    enterMode("preTrip");
+  }
+  // onTrip: don't touch trip state, just zone cache (already cleared above).
+
+  save();
+  render();
+  const here = (typeof nearestZone === "function") ? nearestZone(state.current) : null;
+  const accTxt = result.accuracy != null
+    ? (en ? `±${Math.round(result.accuracy)}m` : `精度 ${Math.round(result.accuracy)}m`)
+    : "";
+  showBanner(
+    en ? "Location updated" : "位置已更新",
+    here ? (en ? `${here.short} · ${accTxt}` : `${here.short} · ${accTxt}`) : accTxt,
+    "good", 2500);
 }
 
 function doResetFlow(){
@@ -10677,6 +11169,53 @@ function maybeShowOnTripOverduePrompt(){
     ]);
 }
 
+/* V8.34.2: gentle reminder when an enRoute pause runs too long.
+   Drivers refuel/eat for 5-15 min normally. At 20 min we nudge ("还在临时停留
+   吗？"), at 45 min we nudge harder ("这次暂停已经很久了"). Each level fires
+   ONCE per pause via two separate flags. */
+function maybeShowEnRoutePauseReminder(){
+  if (state.mode !== "enRoute") return;
+  if (!state.subContext || !state.subContext.enRoutePaused) return;
+  const pausedAt = state.subContext.enRoutePausedAt;
+  if (!pausedAt) return;
+  const elapsedMin = Math.floor((Date.now() - pausedAt) / 60000);
+  const en = currentLang() === "en";
+  const destId = state.subContext.enRouteDest;
+  const dest = destId && typeof zones !== "undefined" ? zones.find(z => z.id === destId) : null;
+  const destShort = dest ? dest.short : (en ? "the spot" : "原目的地");
+
+  // Tier 2: 45 min — stronger
+  if (elapsedMin >= 45 && !state.subContext._pauseReminded45) {
+    state.subContext._pauseReminded45 = true;
+    showBanner(
+      en ? "Long pause" : "暂停时间已经很久",
+      en ? `Paused ${elapsedMin} min — better to re-check from your current location.`
+         : `已停 ${elapsedMin} 分钟，建议重新判断当前位置。`,
+      "warn", 60000,
+      [
+        { label: en ? "Re-check"        : "重新判断",  cls:"primary", onClick: () => repairLocation() },
+        { label: en ? "Keep paused"     : "继续保留",  cls:"ghost",   onClick: () => {} }
+      ]);
+    return;
+  }
+  // Tier 1: 20 min — gentle nudge
+  if (elapsedMin >= 20 && !state.subContext._pauseReminded20) {
+    state.subContext._pauseReminded20 = true;
+    showBanner(
+      en ? "Still paused?" : "还在临时停留吗？",
+      en ? `Paused ${elapsedMin} min.` : `你已停了 ${elapsedMin} 分钟。`,
+      "warn", 60000,
+      [
+        { label: en ? `Continue to ${destShort}` : `继续去 ${destShort}`,
+          cls:"primary", onClick: () => resumeEnRoute() },
+        { label: en ? "Wait here" : "就在这等",
+          cls:"good",    onClick: () => waitHereInsteadOfEnRoute() },
+        { label: en ? "End flow"  : "结束当前流程",
+          cls:"ghost",   onClick: () => doResetFlow() }
+      ]);
+  }
+}
+
 /* =========================================================
    V8.34: drop-off advisor.
    After endTrip(), evaluate the current GPS location and surface
@@ -10748,6 +11287,9 @@ function pauseEnRoute(){
   }
   state.subContext.enRoutePaused = true;
   state.subContext.enRoutePausedAt = Date.now();
+  // V8.34.2: clear reminder flags so the 20/45-min nudges fire fresh
+  state.subContext._pauseReminded20 = false;
+  state.subContext._pauseReminded45 = false;
   // Stay in enRoute mode — the destination is still "the plan."
   // The card will detect enRoutePaused and render a different view.
   save();
@@ -10766,6 +11308,9 @@ function resumeEnRoute(){
   if (!state.subContext) return;
   state.subContext.enRoutePaused = false;
   state.subContext.enRoutePausedAt = null;
+  // V8.34.2: clear pause-reminder flags
+  state.subContext._pauseReminded20 = false;
+  state.subContext._pauseReminded45 = false;
   // enRouteDest is unchanged — we just clear the pause flag and re-render.
   // The card returns to "去推荐点路上" with 到了/临时停/取消 buttons.
   save();
@@ -10786,6 +11331,9 @@ function waitHereInsteadOfEnRoute(){
     state.subContext.enRouteOriginZoneId = null;
     state.subContext.enRoutePaused = false;
     state.subContext.enRoutePausedAt = null;
+    // V8.34.2: clear pause-reminder flags
+    state.subContext._pauseReminded20 = false;
+    state.subContext._pauseReminded45 = false;
   }
   // Use current GPS to determine the new wait location.
   const here = (typeof nearestZone === "function") ? nearestZone(state.current) : null;
@@ -12458,38 +13006,52 @@ function renderSegCardMain(seg, dow, holiday){
     summaryEl.textContent = txt;
   }
 
-  // Subtitle (expanded): short context. Strip leading time range from analysis
-  // so it doesn't repeat the header.
+  // V8.34.1: subtitle stripped down. Pre-V8.34.1 it showed:
+  //   "周日 · 5月3日 · 醉酒 / 短单 / 回程风险上升"
+  // Three problems:
+  //   - Date repeats info already in the day picker
+  //   - "醉酒/短单/回程风险" is jargon — sounds scary, doesn't tell driver what to do
+  //   - Subtitle should set context, not list categories
+  // Now: short context line that just frames the segment in driver-friendly terms.
   const subtitleEl = document.getElementById("segCardMainSubtitle");
   if (subtitleEl) {
-    const today = new Date();
     let cleanAnalysis = (segL.analysis || "");
     cleanAnalysis = cleanAnalysis.replace(/^\s*\d{1,2}:\d{2}(?:\s*[AP]M)?\s*[–\-]\s*\d{1,2}:\d{2}(?:\s*[AP]M)?\s*/i, "");
-    const dayLabel = en
-      ? `${["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][dow]} · ${["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][today.getMonth()]} ${today.getDate()}`
-      : `${dowName[dow]} · ${today.getMonth()+1} 月 ${today.getDate()} 日`;
-    const lines = [dayLabel];
-    if (cleanAnalysis) lines.push(cleanAnalysis);
     if (holiday && holiday.name) {
-      lines.push(`${holiday.name}${holiday.advice ? "：" + holiday.advice : ""}`);
+      const sep = en ? " · " : "·";
+      cleanAnalysis = `${holiday.name}${holiday.advice ? "：" + holiday.advice : ""}${sep}${cleanAnalysis}`;
     }
-    subtitleEl.textContent = lines.join(" · ");
+    subtitleEl.textContent = cleanAnalysis;
   }
 
-  // Steps list (expanded)
+  // V8.34.1: contextual steps — wrap getSegmentSteps with mode/zone awareness.
+  // Pre-V8.34.1, steps were ALWAYS the same regardless of where the driver was
+  // or what they were doing. So a driver in Tacoma got the same "守 Bellevue"
+  // advice as a driver already in Bellevue — useless. Now we adapt:
+  //   - Already in target zone → "守住，别乱动"
+  //   - In remote zone → "先回到主区"
+  //   - In waiting mode → focus on "等多久" advice
+  //   - In enRoute mode → focus on "到了之后怎么办"
+  // Falls back to base steps if context isn't clear.
   const stepsEl = document.getElementById("segCardMainSteps");
   if (stepsEl) {
-    const steps = (typeof getSegmentSteps === "function")
+    const baseSteps = (typeof getSegmentSteps === "function")
       ? (getSegmentSteps(seg, dow, holiday) || [])
       : [];
-    stepsEl.innerHTML = steps.map((s, i) =>
+    const contextual = (typeof getContextualSegmentSteps === "function")
+      ? getContextualSegmentSteps(seg, baseSteps, en)
+      : baseSteps;
+    stepsEl.innerHTML = contextual.map((s, i) =>
       `<li><span class="segStepNum"></span><span class="segStepText"><b>${i+1}</b>${escapeHtml(s)}</span></li>`
     ).join("");
   }
 
-  // V8.27.7.4: progress bar — show how far through the segment window we are.
-  // Segments are stored as minutes-from-midnight (seg.start, seg.end). Compute
-  // current minute, clamp to [0,1], render as fill width + remaining-minutes label.
+  // V8.34.1: progress bar relabeled. Pre-V8.34.1 showed "67% · 还剩 54 分钟"
+  // — driver feedback: "67% 是什么的 67%？" Percentage of segment elapsed is
+  // useless to the driver. Now we show ONLY the actionable info:
+  //   - During segment: "还剩 N 分钟到 [next segment]"
+  //   - For golden segments approaching end: "黄金时段还剩 N 分钟"
+  // Progress bar fill stays — visual cue without the confusing percentage text.
   const progressFill = document.getElementById("segProgressFill");
   const progressLabel = document.getElementById("segProgressLabel");
   if (progressFill && progressLabel && typeof seg.start === "number" && typeof seg.end === "number") {
@@ -12503,17 +13065,135 @@ function renderSegCardMain(seg, dow, holiday){
     const pctRounded = Math.round(pct * 100);
     progressFill.style.width = pctRounded + "%";
 
-    // Remaining minutes
     const remainingMin = Math.max(0, seg.end - nowMin);
+    // Look up next segment for anchor info
+    let nextLabel = "";
+    if (typeof segments !== "undefined" && Array.isArray(segments)) {
+      const nextSeg = segments.find(s => s.start === seg.end) ||
+                      segments.find(s => s.start > seg.end) || null;
+      if (nextSeg) {
+        const ns = (typeof segLocal === "function") ? segLocal(nextSeg) : nextSeg;
+        nextLabel = ns.short || ns.title || "";
+      }
+    }
     const hrs = Math.floor(remainingMin / 60);
     const mins = remainingMin % 60;
-    const remStr = hrs > 0
-      ? (en ? `${hrs}h ${mins}m left` : `还剩 ${hrs} 小时 ${mins} 分`)
-      : (en ? `${mins}m left` : `还剩 ${mins} 分钟`);
-
-    progressLabel.innerHTML =
-      `<span class="segProgressPct">${pctRounded}%</span><span>${remStr}</span>`;
+    let remStr;
+    if (en) {
+      const remBase = hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
+      remStr = nextLabel ? `${remBase} until ${nextLabel}` : `${remBase} left`;
+    } else {
+      const remBase = hrs > 0 ? `${hrs} 小时 ${mins} 分` : `${mins} 分钟`;
+      remStr = nextLabel ? `还剩 ${remBase} 到「${nextLabel}」` : `还剩 ${remBase}`;
+    }
+    // V8.34.1: dropped the "67%" leading badge — just show the time anchor.
+    progressLabel.textContent = remStr;
   }
+}
+
+/* =========================================================
+   V8.34.1: Contextual segment steps.
+   Wraps the static base steps with awareness of:
+   - state.mode (preTrip / waiting / enRoute / onTrip / goHome / rescue)
+   - driver's current zone
+   - segment's target zones (for "are you in the right place?")
+   Returns 2-3 SHORT actionable lines, replacing or filtering base steps
+   when context makes them irrelevant or contradictory.
+   ========================================================= */
+function getContextualSegmentSteps(seg, baseSteps, en){
+  if (!Array.isArray(baseSteps)) baseSteps = [];
+  // Limit to 3 — driver can't read more on a small card
+  const trimmed = baseSteps.slice(0, 3);
+
+  // Defensive fallbacks if helpers don't exist
+  const here = (typeof state !== "undefined" && state.current && typeof nearestZone === "function")
+    ? nearestZone(state.current) : null;
+  const mode = (typeof state !== "undefined") ? state.mode : "preTrip";
+
+  // Skip context tweaks if we don't know where the driver is
+  if (!here) return trimmed;
+
+  // Is driver currently in a target zone for this segment?
+  const targetIds = (seg && Array.isArray(seg.targetZoneIds)) ? seg.targetZoneIds : [];
+  const inTarget = targetIds.includes(here.id);
+
+  // Remote zones — driver was likely brought there by a fare. The base "go
+  // to Bellevue" advice doesn't help; they need stepping-stone guidance.
+  const remoteIds = ["seatac","tacoma","federal_way","everett","lynnwood","seattle_downtown"];
+  const isRemote = remoteIds.includes(here.id);
+
+  if (en) {
+    // English path — keep base steps mostly. Just prepend a "you're at X" hint
+    // when usefully informative.
+    if (isRemote) {
+      return [
+        `Currently at ${here.short} — far from main zones.`,
+        "Frog-hop back; don't camp here.",
+        ...(trimmed.slice(0, 1))
+      ];
+    }
+    if (inTarget && (seg.tone === "good")) {
+      return [
+        `Currently at ${here.short} — solid spot for this window.`,
+        "Hold position; don't bounce around.",
+        ...(trimmed.slice(0, 1))
+      ];
+    }
+    return trimmed;
+  }
+
+  // Chinese: more nuanced contextualization
+  // 1. Driver in remote zone during ANY segment → "先蛙跳，别守这"
+  if (isRemote) {
+    return [
+      `当前在 ${here.short}，离主区远。`,
+      "先蛙跳到近区（Renton / Southcenter / Bellevue），别在这死等。",
+      ...(trimmed.slice(0, 1))  // keep one base tip for the time window
+    ];
+  }
+
+  // 2. Driver IN target zone during a "good" segment → "守住"
+  if (inTarget && seg.tone === "good") {
+    return [
+      `${here.short} 当前时段比较稳，守住。`,
+      ...(trimmed.slice(0, 2))
+    ];
+  }
+
+  // 3. Driver IN target zone during a "warn" segment → "可以等，但短测"
+  if (inTarget && seg.tone === "warn") {
+    return [
+      `${here.short} 还行但当前时段偏冷，短测一下。`,
+      "10 分钟没单就换点。",
+      ...(trimmed.slice(0, 1))
+    ];
+  }
+
+  // 4. Driver NOT in target zone → "去 [target]"
+  if (!inTarget && targetIds.length > 0) {
+    const targetZone = (typeof zones !== "undefined")
+      ? zones.find(z => z.id === targetIds[0])
+      : null;
+    if (targetZone) {
+      // For golden windows: be direct about moving
+      if (seg.tone === "good") {
+        return [
+          `当前在 ${here.short}，但 ${targetZone.short} 当前时段更稳。`,
+          "考虑过去，或先短测当前位置。",
+          ...(trimmed.slice(0, 1))
+        ];
+      }
+      // For non-golden: less urgent
+      return [
+        `当前在 ${here.short}，时段一般，可以原地短等。`,
+        ...(trimmed.slice(0, 2))
+      ];
+    }
+  }
+
+  // 5. No targetZoneIds defined for this segment, or other edge case
+  // → just return base steps
+  return trimmed;
 }
 
 /* =========================================================
